@@ -1,0 +1,55 @@
+name: Generate debian package
+
+on: [push, pull_request]
+
+env:
+  PERSIST_DIR: /srv/gh-runners/quic-qrb-ros
+  DL_DIR: /srv/gh-runners/quic-qrb-ros/downloads
+  WORKSPACE: ${{ github.workspace }}/ros_ws
+  SDK_DIR: ${{ github.workspace }}/sdk
+  QCOM_SELECTED_BSP: custom
+
+jobs:
+  build_in_ros_docker:
+    runs-on: [ubuntu-24.04-arm]
+    container: ros:jazzy
+    steps:
+      # - name: Set up ROS env
+      #   uses: ros-tooling/setup-ros@v0.7
+      #   with:
+      #     required-ros-distributions: jazzy
+
+      - name: Install debian tools
+        run: |
+          apt-get update
+          apt-get install python3-bloom python3-rosdep fakeroot debhelper dh-python -y
+          rosdep update
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build deb from source
+        shell: bash
+        run: |
+          source /opt/ros/jazzy/setup.bash
+          bloom-generate rosdebian
+          fakeroot debian/rules binary
+
+  build_in_ubuntu_docker:
+    runs-on: [ubuntu-24.04-arm]
+    container: ubuntu:noble
+    steps:
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+      - shell: bash
+        run: "source /opt/ros/jazzy/setup.bash && ros2 run --help"
+
+  build_in_runner:
+    runs-on: [ubuntu-24.04-arm]
+    steps:
+      - uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+      - shell: bash
+        run: "source /opt/ros/jazzy/setup.bash && ros2 run --help"
