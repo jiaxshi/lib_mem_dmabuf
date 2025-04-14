@@ -22,7 +22,7 @@ jobs:
       - name: Install debian tools
         run: |
           apt-get update
-          apt-get install python3-bloom python3-rosdep fakeroot debhelper dh-python -y
+          apt-get install python3-bloom python3-rosdep fakeroot debhelper dh-python --no-install-recommends -y
           rosdep update
 
       - name: Checkout code
@@ -53,3 +53,13 @@ jobs:
           required-ros-distributions: jazzy
       - shell: bash
         run: "source /opt/ros/jazzy/setup.bash && ros2 run --help"
+
+  build_with_ros2-build-debian-action:
+    runs-on: [ubuntu-24.04-arm]
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+      - name: Build Debian packages
+        uses: ichiro-its/ros2-build-debian-action@main
+        with:
+          ros2-distro: jazzy
