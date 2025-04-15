@@ -63,3 +63,13 @@ jobs:
         uses: ichiro-its/ros2-build-debian-action@main
         with:
           ros2-distro: jazzy
+  build_with_ros2-build-debian-action_in_ros_docker:
+    container: ros:jazzy
+    runs-on: [ubuntu-24.04-arm]
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+      - name: Build Debian packages
+        uses: ichiro-its/ros2-build-debian-action@main
+        with:
+          ros2-distro: jazzy
