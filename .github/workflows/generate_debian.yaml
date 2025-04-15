@@ -64,7 +64,9 @@ jobs:
         with:
           ros2-distro: jazzy
   build_with_ros2-build-debian-action_in_ros_docker:
-    container: ros:jazzy
+    container:
+      image: ros:jazzy
+      options: --mount type=bind,source=${{ github.action_path }},target=/home/runner/work/_actions
     runs-on: [ubuntu-24.04-arm]
     steps:
       - name: Checkout this repository
