@@ -10,16 +10,36 @@ env:
   QCOM_SELECTED_BSP: custom
 
 jobs:
+
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      machine: ${{ steps.parse-config.outputs.machine }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y python3-pip
+          sudo pip3 install yq
+
+      - name: Parse config.yaml
+        id: parse-config
+        run: |
+          machines=$(yq '.machines[].name' config.yaml | jq -s -c)
+          echo "Machines: $machines"
+          
+          echo "machine=${machines}" >> $GITHUB_OUTPUT
+            
   build:
+    needs: generate-matrix
     runs-on: [self-hosted, x86]
     timeout-minutes: 720
     strategy:
       fail-fast: false
-      matrix:
-        machine:
-          - qcs6490-rb3gen2-vision-kit
-          - qcs9075-rb8-core-kit
-          - qcs8300-ride-sx
+      matrix: 
+        machine: ${{ fromJson(needs.generate-matrix.outputs.machine) }}
         distro:
           - qcom-robotics-ros2-jazzy
     steps:
@@ -82,7 +102,8 @@ jobs:
           build_dir=${PERSIST_DIR}/builds/${GITHUB_RUN_ID}
           mkdir -p $build_dir
 
-          tar -cvf ${build_dir}/artifacts.tar ${WORKSPACE}/install ${WORKSPACE}/build ${WORKSPACE}/log
+          tar -cvf ${build_dir}/${{ github.event.repository.name }}-${MACHINE}-${DISTRO}-${QCOM_SELECTED_BSP}-artifacts.tar --transform "s|^${WORKSPACE}/||" -C ${WORKSPACE} install build log
+
           ##########################debug###############################
           ls -al  ${build_dir}
 
