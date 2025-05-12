@@ -7,5 +7,4 @@ jobs:
     uses: jiaxshi/qrb_ros_imu/.github/workflows/pull-request.yml@jiaxshi-patch-2
     with:
       config-path: .github/pull-request.yml
-    secrets:
-      personal_access_token: ${{ secrets.token }}
+    secrets: inherit
