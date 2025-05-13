@@ -4,5 +4,5 @@ on: [push, pull_request]
 
 jobs:
   commitlint:
-    uses: jiaxshi/qrb_ros_imu/.github/workflows/pull-request.yml@jiaxshi-patch-2
+    uses: qualcomm-qrb-ros/.github/.github/workflows/commitlint.yml@commitlint
     secrets: inherit
