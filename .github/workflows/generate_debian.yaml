@@ -63,15 +63,28 @@ jobs:
         uses: ichiro-its/ros2-build-debian-action@main
         with:
           ros2-distro: jazzy
+
   build_with_ros2-build-debian-action_in_ros_docker:
     container:
       image: ros:jazzy
-      options: --mount type=bind,source=${{ github.action_path }},target=/home/runner/work/_actions
+      #options: --mount type=bind,source=${{ github.action_path }},target=/home/runner/work/_actions
     runs-on: [ubuntu-24.04-arm]
     steps:
+      - name: print env
+        run: |
+          env
+          echo "github.action_path: ${{ github.action_path }}"
+          echo "GITHUB_ACTION_PATH: ${GITHUB_ACTION_PATH}"
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
+
       - name: Checkout this repository
         uses: actions/checkout@v4
       - name: Build Debian packages
         uses: ichiro-its/ros2-build-debian-action@main
         with:
           ros2-distro: jazzy
+          github.action_path: /__w/_actions/ichiro-its/ros2-build-debian-action
+
+          run: |
+            echo "github.action_path: ${{ github.action_path }}"
+            echo "GITHUB_ACTION_PATH: ${GITHUB_ACTION_PATH}"
