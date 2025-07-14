@@ -31,4 +31,6 @@ jobs:
 
       - name: Print
         run: |
+          tree ${{ github.workspace }}
+          echo "===="
           tree ${WORKSPACE}
