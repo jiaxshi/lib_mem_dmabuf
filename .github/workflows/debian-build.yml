@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          path: ${{ github.workspace }}/ros_ws
+          path: ${{ github.workspace }}/ros_ws/${{ github.repository }}
 
       - name: Print
         run: |
@@ -28,3 +28,7 @@ jobs:
         uses: jiaxshi/Sample@debian-build
         with:
           src-dir: ${WORKSPACE}
+
+      - name: Print
+        run: |
+          tree ${WORKSPACE}
