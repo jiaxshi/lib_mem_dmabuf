@@ -1,0 +1,41 @@
+name: Build QRB ROS packages on Ubuntu
+
+on:
+  workflow_call:
+    inputs:
+      dependencies:
+        description: 'List of repositories to checkout, e.g. "owner/repo1 owner/repo2"'
+        type: string
+        required: false
+      colcon_args:
+        description: 'Colcon build arguments, e.g. --cmake-args -DCMAKE_BUILD_TYPE=Release'
+        type: string
+        required: false
+
+env:
+    ROS_WS: ${{ github.workspace }}/ros2_ws/
+    ROS_SRC: ${{ env.ROS_WS }}/src
+
+jobs:
+  ros-build:
+    runs-on: [ubuntu-24.04-arm]
+    container: ros:jazzy
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROS_SRC }}/${{ github.event.repository.name }}
+      - name: Checkout dependency
+        run: |
+          for repo in ${{ inputs.dependencies }}; do
+            git clone https://github.com/${repo}.git ${ROS_SRC}/${repo#*/} || true
+          done
+      - name: Build ROS packages
+        shell: bash
+        run: |
+          cd ${ROS_WS}
+          source /opt/ros/jazzy/setup.sh
+          colcon build ${{ inputs.colcon_args}}
+          tree $ROS_WS
+          
+
