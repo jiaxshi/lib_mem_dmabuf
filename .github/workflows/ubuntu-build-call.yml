@@ -26,6 +26,10 @@ jobs:
     runs-on: [ubuntu-24.04-arm]
     container: ros:jazzy
     steps:
+      - name: Update
+        run: |
+          sudo apt update -y && sudo apt upgrade -y
+          sudo apt install tree
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
@@ -37,8 +41,8 @@ jobs:
           done
       - name: Check ROS dependency
         run: |
-          rosdep update
-          rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${SRC_DIR} --ignore-src  || exit $?
+          sudo rosdep update
+          sudo rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${ROS_SRC} --ignore-src  || exit $?
       - name: Build ROS packages
         shell: bash
         run: |
