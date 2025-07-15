@@ -11,6 +11,11 @@ on:
         description: 'Colcon build arguments, e.g. --cmake-args -DCMAKE_BUILD_TYPE=Release'
         type: string
         required: false
+      ros-distro:
+        description: 'ROS2 distribution to use, e.g. humble'
+        type: string
+        required: false
+        default: jazzy
 
 env:
     ROS_WS: ${{ github.workspace }}/ros2_ws/
@@ -30,12 +35,15 @@ jobs:
           for repo in ${{ inputs.dependencies }}; do
             git clone https://github.com/${repo}.git ${ROS_SRC}/${repo#*/} || true
           done
+      - name: Check ROS dependency
+        run: |
+          rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${SRC_DIR} --ignore-src  || exit $?
       - name: Build ROS packages
         shell: bash
         run: |
           cd ${ROS_WS}
           source /opt/ros/jazzy/setup.sh
-          colcon build ${{ inputs.colcon_args}}
+          colcon build ${{ inputs.colcon_args }}
           tree $ROS_WS
           
 
