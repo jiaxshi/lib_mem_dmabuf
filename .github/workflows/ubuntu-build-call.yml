@@ -14,7 +14,7 @@ on:
 
 env:
     ROS_WS: ${{ github.workspace }}/ros2_ws/
-    ROS_SRC: ${{ env.ROS_WS }}/src
+    ROS_SRC: ${{ github.workspace }}/ros2_ws/src
 
 jobs:
   ros-build:

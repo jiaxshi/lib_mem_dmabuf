@@ -30,6 +30,6 @@ jobs:
           colcon build
           
   ros-build-caller:
-    uses: jiaxshi/lib_mem_dmabuf/.github/workflows/ubuntu-build-call.yml@ubuntu-build
+    uses: ./.github/workflows/ubuntu-build-call.yml@ubuntu-build
     with:
       dependency: "qualcomm-qrb-ros/dmabuf_transport qualcomm-qrb-ros/qrb_ros_interfaces"
