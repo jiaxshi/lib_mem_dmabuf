@@ -37,6 +37,7 @@ jobs:
           done
       - name: Check ROS dependency
         run: |
+          rosdep update
           rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${SRC_DIR} --ignore-src  || exit $?
       - name: Build ROS packages
         shell: bash
