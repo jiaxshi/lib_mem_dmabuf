@@ -16,6 +16,10 @@ on:
         type: string
         required: false
         default: jazzy
+      apt-packages:
+        description: 'List of apt packages to install, e.g. "python3-pip python3-rosdep"'
+        type: string
+        required: false
 
 env:
     ROS_WS: ${{ github.workspace }}/ros2_ws/
@@ -26,10 +30,10 @@ jobs:
     runs-on: [ubuntu-24.04-arm]
     container: ros:jazzy
     steps:
-      - name: Update
+      - name: Update and install extra packages
         run: |
           sudo apt update -y && sudo apt upgrade -y
-          sudo apt install tree
+          sudo apt install -y tree ${{ inputs.apt-packages }} || exit $?
       - name: Checkout source code
         uses: actions/checkout@v4
         with:

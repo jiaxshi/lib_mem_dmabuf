@@ -33,3 +33,4 @@ jobs:
     uses: ./.github/workflows/ubuntu-build-call.yml
     with:
       dependencies: "qualcomm-qrb-ros/dmabuf_transport qualcomm-qrb-ros/qrb_ros_interfaces"
+      apt-packages: "wget git"
