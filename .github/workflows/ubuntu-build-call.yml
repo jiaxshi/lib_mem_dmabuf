@@ -33,7 +33,7 @@ jobs:
       - name: Update and install extra packages
         run: |
           sudo apt update -y && sudo apt upgrade -y
-          sudo apt install -y tree ${{ inputs.apt-packages }} || exit $?
+          sudo apt install -y tree ${{ inputs.apt-packages }}
       - name: Checkout source code
         uses: actions/checkout@v4
         with:
@@ -46,7 +46,7 @@ jobs:
       - name: Check ROS dependency
         run: |
           sudo rosdep update
-          sudo rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${ROS_SRC} --ignore-src  || exit $?
+          sudo rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${ROS_SRC} --ignore-src
       - name: Build ROS packages
         shell: bash
         run: |
@@ -55,4 +55,38 @@ jobs:
           colcon build ${{ inputs.colcon_args }}
           tree $ROS_WS
           
+  ros-build-host:
+    runs-on: [ubuntu-24.04-arm]
+    steps:
+      - name: Base env set up
+        run: |
+          sudo apt update -y && sudo apt upgrade -y
+          sudo apt install -y tree ${{ inputs.apt-packages }}
+      - name: Add ROS 2 apt repository and install development tools
+        run: |
+          sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
+          sudo apt update
+          sudo apt install ros-dev-tools
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROS_SRC }}/${{ github.event.repository.name }}
+      - name: Checkout dependency
+        run: |
+          for repo in ${{ inputs.dependencies }}; do
+            git clone https://github.com/${repo}.git ${ROS_SRC}/${repo#*/} || true
+          done
+      - name: Check ROS dependency
+        run: |
+          sudo rosdep init
+          sudo rosdep update
+          sudo rosdep install -y --rosdistro ${{ inputs.ros-distro }} --from-paths ${ROS_SRC} --ignore-src
+      - name: Build ROS packages
+        shell: bash
+        run: |
+          cd ${ROS_WS}
+          source /opt/ros/jazzy/setup.sh
+          colcon build ${{ inputs.colcon_args }}
+          tree $ROS_WS
