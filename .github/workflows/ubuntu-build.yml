@@ -34,3 +34,26 @@ jobs:
     with:
       dependencies: "qualcomm-qrb-ros/dmabuf_transport qualcomm-qrb-ros/qrb_ros_interfaces"
       apt-packages: "wget git"
+
+  ros-build-runner:
+    runs-on: [ubuntu-24.04-arm]
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+        with:
+          path: ${{ env.ROS_SRC }}/${{ github.event.repository.name }}
+      - name: Checkout dependency
+        uses: actions/checkout@v4
+        with:
+          repository: qualcomm-qrb-ros/dmabuf_transport
+          path: ${{ env.ROS_SRC }}/dmabuf_transport
+      - name: Set up ROS environment
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: jazzy
+      - name: Build ROS packages
+        shell: bash
+        run: |
+          cd ${ROS_WS}
+          source /opt/ros/jazzy/setup.sh
+          colcon build
