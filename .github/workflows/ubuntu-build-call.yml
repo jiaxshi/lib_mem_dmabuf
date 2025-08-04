@@ -43,7 +43,7 @@ jobs:
       - name: Download code with vcs import
         if: inputs.vcstool_repo_yaml != ''
         run: |
-          mkdir ${ROS_SRC}
+          mkdir -p ${ROS_SRC}
           cd ${ROS_SRC}
           # 下载 .repos 文件
           # 假设 .repos 文件在仓库的根目录，或者你可以调整下载路径
