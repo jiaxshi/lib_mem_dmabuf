@@ -20,6 +20,11 @@ on:
         description: 'List of apt packages to install, e.g. "python3-pip python3-rosdep"'
         type: string
         required: false
+      vcstool_repo_yaml: # <-- 新增参数
+        description: 'Path to a .repos file to use with vcs import, e.g. repos.yaml. If provided, overrides default checkout/dependencies.'
+        type: string
+        required: false
+        default: ''
 
 env:
     ROS_WS: ${{ github.workspace }}/ros2_ws/
@@ -33,12 +38,24 @@ jobs:
       - name: Update and install extra packages
         run: |
           sudo apt update -y && sudo apt upgrade -y
-          sudo apt install -y tree ${{ inputs.apt-packages }}
+          sudo apt install -y tree python3-vcstool ${{ inputs.apt-packages }}
+
+      - name: Download code with vcs import
+        if: inputs.vcstool_repo_yaml != ''
+        run: |
+          cd ${ROS_SRC}
+          # 下载 .repos 文件
+          # 假设 .repos 文件在仓库的根目录，或者你可以调整下载路径
+          wget https://raw.githubusercontent.com/qualcomm-qrb-ros/qrb_ros_distro/refs/heads/release-0.2.0/jazzy/repo.yaml -O ${{ inputs.vcstool_repo_yaml }}
+          vcs import < ${{ inputs.vcstool_repo_yaml }}
+
       - name: Checkout source code
+        if: inputs.vcstool_repo_yaml == ''
         uses: actions/checkout@v4
         with:
           path: ${{ env.ROS_SRC }}/${{ github.event.repository.name }}
       - name: Checkout dependency
+        if: inputs.vcstool_repo_yaml == ''
         run: |
           for repo in ${{ inputs.dependencies }}; do
             git clone https://github.com/${repo}.git ${ROS_SRC}/${repo#*/} || true
