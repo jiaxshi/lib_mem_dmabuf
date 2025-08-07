@@ -1,0 +1,12 @@
+name: Build QRB ROS packages on Ubuntu
+
+on:
+    push:
+    pull_request:
+
+jobs:
+  ros-build:
+    uses: ./.github/workflows/deb-build-call.yml
+    # with:
+      # QRB ROS dependency
+      # dependencies: "qualcomm-qrb-ros/qrb_ros_transport qualcomm-qrb-ros/lib_mem_dmabuf"
