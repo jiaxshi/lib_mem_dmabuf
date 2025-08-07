@@ -61,6 +61,7 @@ jobs:
           source /opt/ros/jazzy/setup.sh
           colcon build ${{ inputs.colcon_args }}
       - name: Build deb
+        shell: bash
         run: |
           cd ${ROS_WS}
           source /opt/ros/jazzy/setup.sh
